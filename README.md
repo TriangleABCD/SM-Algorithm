@@ -1,2 +1,2 @@
 # SM-Algorithm
-SM algorithms in C++
+parallel SM algorithms in C++
