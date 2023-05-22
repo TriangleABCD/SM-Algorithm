@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <bitset>
+#include <omp.h>
 
 using namespace std;
 

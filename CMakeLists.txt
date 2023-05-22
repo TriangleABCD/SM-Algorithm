@@ -7,7 +7,7 @@ find_package(OpenMP REQUIRED)
 
 include_directories(./include)
 
-add_compile_options(-std=c++17 -Wall)
+add_compile_options(-std=c++17 -Wall -O3)
 
 aux_source_directory(./src SRC)
 
