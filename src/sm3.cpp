@@ -67,4 +67,3 @@ void SM3::digest() {
 
 }
 
-

@@ -58,3 +58,4 @@ struct SM3 {
     void digest();
 
 };
+
