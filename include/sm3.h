@@ -53,9 +53,15 @@ struct SM3 {
 
     WORD P1(WORD X);
 
-    WORD rLeftShift(const WORD& w, int x);
+    WORD rLeftShift(WORD w, int x);
+
+    std::vector<WORD> getW(BIT512& B);
+
+    void CF(std::vector<WORD>& V, BIT512 B, std::vector<WORD>& NV);
 
     void digest();
+
+    std::string getHash();
 
 };
 
