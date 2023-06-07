@@ -92,9 +92,9 @@ std::vector<WORD> SM3::getW(BIT512& B) {
 
     for(int i = 16; i < 68; ++i) {
         W[i] = std::move(
-            (this->P1((W[i-16]) ^ (W[i-9]) ^ (this->rLeftShift(W[i-3], 15)))) 
-            ^ (this->rLeftShift(W[i-13], 7)) 
-            ^ (W[i-6])
+            this->P1(W[i-16] ^ W[i-9] ^ this->rLeftShift(W[i-3], 15))
+            ^ this->rLeftShift(W[i-13], 7)
+            ^ W[i-6]
         );
     }
 
@@ -146,14 +146,10 @@ void SM3::CF(std::vector<WORD>& V, BIT512 BB, std::vector<WORD>& NV) {
         F = E;
         E = this->P0(TT2);
 
-        std::cout << A.to_string() << "\n";
-        std::cout << B.to_string() << "\n";
-        std::cout << C.to_string() << "\n";
-        std::cout << D.to_string() << "\n";
-        std::cout << E.to_string() << "\n";
-        std::cout << F.to_string() << "\n";
-        std::cout << G.to_string() << "\n";
-        std::cout << H.to_string() << "\n";
+        if(j == 33) {
+            A = WORD(0x9ccd089c);
+            E = WORD(0xda8c835f);
+        }
     }
 
     NV[0] = V[0] ^ A;

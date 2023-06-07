@@ -22,7 +22,7 @@ struct SM3 {
     std::function<WORD(int)> Tj = [](int j) -> WORD {
         if(0 <= j && j <= 15) {
             return WORD((unsigned long)0x79cc4519);
-        } else if(16 < j && j <= 63) {
+        } else if(16 <= j && j <= 63) {
             return WORD((unsigned long)0x7a879d8a);
         } else {
             return WORD(0);
