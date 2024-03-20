@@ -10,9 +10,9 @@ clean:
 	@rm -rf a.out
 
 sm3: main
-	@./a.out sm3 `cat test/sm3.test`
+	@./a.out sm3 `cat test/sm3.msg`
 
 sm4: main
-	@./a.out sm4 `cat test/sm4.test`
+	@./a.out sm4 `cat test/sm4.msg` `cat test/sm4.key`
 
 .PHONY: clean sm3 sm4
