@@ -6,7 +6,6 @@
 #include <iomanip>
 #include <vector>
 #include <string>
-#include <sstream>
 #include <bitset>
 #include <stdint.h>
 
@@ -35,6 +34,7 @@ struct SM4 {
     this->init();
     this->setMsg(msg);
     this->setKey(key);
+    this->genRK();
   }
 
   void init() {
@@ -78,20 +78,20 @@ struct SM4 {
   }
     
   void setMsg(const std::string& msg) {
-    for (int i = 3; i >= 0; --i) {
-      this->X[i] = word(msg.substr(i*32, 32));
+    for (int i = 0; i < 4; ++i) {
+      this->X[i] = *(word*)(msg.c_str() + 4*i);
     }
   }
 
   void setKey(const std::string& key) {
-    for (int i = 3; i >= 0; --i) {
-      this->MK[i] = word(key.substr(i*32, 32));
+    for (int i = 0; i < 4; ++i) {
+      this->MK[i] = *(word*)(key.c_str() + 4*i);
     }
   }
 
   void rLeftShift(word& w, int x) {
     x %= 32;
-    auto t = w;
+    word t = w;
     t >>= (32 - x);
     w <<= x;
     w |= t;
@@ -143,7 +143,7 @@ struct SM4 {
       {0x18, 0xf0, 0x7d, 0xec, 0x3a, 0xdc, 0x4d, 0x20, 0x79, 0xee, 0x5f, 0x3e, 0xd7, 0xcb, 0x39, 0x48}
     };
 
-    return byte(box[x][y]);
+    return byte(box[y][x]);
   }
 
   word Tao(const word& w) {
@@ -187,45 +187,51 @@ struct SM4 {
   void genRK() {
     std::vector<word> kk{std::vector<word>(36)};
     for (int i = 0; i < 4; ++i) {
-        kk[i] = MK[i];
-        kk[i] ^= FK[i];
+      kk[i] = MK[i];
+      kk[i] ^= FK[i];
     }
     for (int i = 0; i < 32; ++i) {
-        kk[i+4] = kk[i];
-        kk[i+4] ^= TT(kk[i+1] ^ kk[i+2] ^ kk[i+3] ^ CK[i]);
-        rk[i] = kk[i+4];
+      kk[i+4] = kk[i];
+      kk[i+4] ^= TT(kk[i+1] ^ kk[i+2] ^ kk[i+3] ^ CK[i]);
+      rk[i] = kk[i+4];
     }
   }
 
   void encrypt() {
     for (int i = 0; i < 32; ++i) {
-        X[i+4] = this->F(
-            X[i], X[i+1], X[i+2], X[i+3], rk[i]
-        );    
+      X[i+4] = this->F(
+          X[i], X[i+1], X[i+2], X[i+3], rk[i]
+      );    
     }
     for (int i = 0; i < 4; ++i) {
-        Y[i] = X[35-i];
+      Y[i] = X[35-i];
     }
   }
 
   void decrypt() {
     for (int i = 0; i < 32; ++i) {
-        X[i+4] = this->F(
-            X[i], X[i+1], X[i+2], X[i+3], rk[31-i]
-        );    
+      X[i+4] = this->F(
+        X[i], X[i+1], X[i+2], X[i+3], rk[31-i]
+      );    
     }
     for (int i = 0; i < 4; ++i) {
-        Y[i] = X[35-i];
+      Y[i] = X[35-i];
     }
   }
 
-  std::string getCode() {
-    this->encrypt();
+  std::string getCode(int op) {
+    if (0 == op) {
+      this->encrypt();
+    } else {
+      this->decrypt();
+    }
     std::string str = "";
-    for(int i = 0; i < 4; ++i) {
-      std::stringstream ss;
-      ss << std::setbase(16) << std::setfill('0') << std::setw(8) << Y[i].to_ulong();
-      str += ss.str();
+    for (int i = 0; i < 4; ++i) {
+      u32 num = this->Y[i].to_ulong();
+      for (int j = 0; j < 32; j += 8) {
+        unsigned char c = char((num >> j) & 0xff);
+        str += c;
+      }
     }
     return str;
   }

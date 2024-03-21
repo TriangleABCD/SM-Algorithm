@@ -5,37 +5,35 @@
 #include "SM3.hpp"
 #include "SM4.hpp"
 
-void test_SM3(const std::string& msg) {
-  std::cout << "message: " << msg << std::endl;
-  std::cout << "hash: ";
-  SM::SM3 sm3(msg);
-  auto res = sm3.getHash();
-  int sp = 0;
-  for (auto & c : res) {
-    std::cout << c;
-    ++sp;
-    if (sp % 8 == 0) {
-      std::cout << " ";
-    }
+void showBytes(const std::string& str) {
+  for(auto& c : str) {
+    std::cout << std::setbase(16) << std::setfill('0') << std::setw(2) << int((unsigned char)c);
   }
   std::cout << std::endl;
 }
 
+void test_SM3(const std::string& msg) {
+  std::cout << "[*] message:\t" << msg << std::endl;
+  std::cout << "[*] hash:\t";
+  SM::SM3 sm3(msg);
+  auto res = sm3.getHash();
+  std::cout << res << std::endl;
+}
+
 void test_SM4(const std::string& msg, const std::string& key) {
-  std::cout << "message: " << msg << std::endl;
-  std::cout << "key: " << key << std::endl;
-  std::cout << "result:\n"; 
+  std::cout << "[*] message:\t\t";
+  showBytes(msg);
+  std::cout << "[*] key:\t\t";
+  showBytes(key);
+  std::cout << "[*] encrypt result:\t"; 
   SM::SM4 sm4(msg, key);
-  auto res = sm4.getCode();
-  int sp = 0;
-  for (auto & c : res) {
-    std::cout << c;
-    ++sp;
-    if (sp % 8 == 0) {
-      std::cout << " ";
-    }
-  }
-  std::cout << std::endl;
+  auto res = sm4.getCode(0);
+  showBytes(res);
+
+  sm4.setMsg(res);
+  std::cout << "[*] decrypt result:\t"; 
+  res = sm4.getCode(1);
+  showBytes(res);
 }
 
 int main(int argc, char** argv) {
